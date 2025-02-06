@@ -23,6 +23,7 @@ jobs:
                     tag_suffix: debian
                   - file: Dockerfile.alpine
                     tag_suffix: alpine
+            fail-fast: false
 
         steps:
             - name: Checkout repository
