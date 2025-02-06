@@ -21,8 +21,10 @@ jobs:
                 include:
                   - file: Dockerfile.bookworm
                     tag_suffix: debian
+                    flavor: bookworm
                   - file: Dockerfile.alpine
                     tag_suffix: alpine
+                    flavor: alpine
             fail-fast: false
 
         steps:
@@ -64,6 +66,16 @@ jobs:
               env:
                 BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
                 HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }} 
+                CACHE_FROM: |
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-9.5-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-9.6-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-10-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-11-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-12-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-13-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-14-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-15-${{ matrix.operating_system.flavor }}
+                  type=registry,ref=pgautoupgrade/pgautoupgrade:build-16-${{ matrix.operating_system.flavor }}
               with:
                   context: .
                   file: ${{ matrix.file }}
@@ -74,3 +86,5 @@ jobs:
                     ghcr.io/pgautoupgrade/pgautoupgrade:${{ env.HEAD_SHA }}-${{ matrix.tag_suffix }}
                   labels: ${{ steps.meta.outputs.labels }}
                   platforms: linux/amd64,linux/arm64
+                  cache-to: type=inline
+                  cache-from: "${{ env.CACHE_FROM }}"
